@@ -1,0 +1,54 @@
+package com.example.LLM_Springboot;
+
+import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.ollama.OllamaChatModel;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/ollama")
+@CrossOrigin(origins = "http://localhost:5173")
+public class Ollama_Controller {
+
+    //1st way to do it
+    private ChatClient chatClient;              //1 -> it built top of chatModel, 2 ->it has extra features than chatModel
+                                                // 3 -> it also add one more layer of abstraction.
+
+    public Ollama_Controller(OllamaChatModel chatModel){  // The ONLY WAY TO CREATE chatClient is using chatModel(OllamaChatModel chatModel)
+        this.chatClient = ChatClient.create(chatModel);  // we are creating chatClient using chatModel
+    }
+
+    @GetMapping("/{question}")
+    public ResponseEntity<String> getResponse(@PathVariable String question){
+
+        String response = chatClient.prompt(question) // chatClient.prompt(question) -> it creates a prompt with the question
+                                    .call()          // .call() -> it calls the model and get the response
+                                     .content();    // .content() -> it gets the content of the response
+
+
+
+        return ResponseEntity.ok(response);
+
+    }
+
+
+
+
+
+    // this is 2nd way to do it
+
+//    public AnthropicChatModel chatModel;
+//
+//    public Anthropic_Controller(OllamaChatModel chatModel){
+//        this.chatModel = chatModel;
+//    }
+//
+    // @GetMapping("/{question}")
+//    public ResponseEntity<String> getResponse(@PathVariable String question){
+//
+//        String response = chatModel.call(question);
+//
+//        return ResponseEntity.ok(response);
+//
+//    }
+}
